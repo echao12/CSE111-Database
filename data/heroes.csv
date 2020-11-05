@@ -1,0 +1,36 @@
+Name,Hero Power Name,Hero Power Cost,Hero Power Text,Class
+"Illidan Stormrage","Demon Claws",1,"+1 Attack this turn.",Demon Hunter
+"Aranna Starseeker","Demon Claws",1,"+1 Attack this turn.",Demon Hunter
+"Malfurion Stormrage","Shapeshift",2,"+1 Attack this turn. +1 Armor.",Druid
+"Lunara","Shapeshift",2,"+1 Attack this turn. +1 Armor.",Druid
+"Elise Starseeker","Shapeshift",2,"+1 Attack this turn. +1 Armor.",Druid
+"Dame Hazelbark","Shapeshift",2,"+1 Attack this turn. +1 Armor.",Druid
+"Rexxar","Steady Shot",2,"Deal 2 damage to the enemy hero.",Hunter
+"Alleria Windrunner","Steady Shot",2,"Deal 2 damage to the enemy hero.",Hunter
+"Sylvanas Windrunner","Steady Shot",2,"Deal 2 damage to the enemy hero.",Hunter
+"Jaina Proudmoore","Fireblast",2,"Deal 1 damage.",Mage
+"Medivh","Fireblast",2,"Deal 1 damage.",Mage
+"Khadgar","Fireblast",2,"Deal 1 damage.",Mage
+"Kel'Thuzad","Fireblast",2,"Deal 1 damage.",Mage
+"Uther Lightbringer","Reinforce",2,"Summon a 1/1 Silver Hand Recruit.",Paladin
+"Lady Liadrin","Reinforce",2,"Summon a 1/1 Silver Hand Recruit.",Paladin
+"Prince Arthas","Reinforce",2,"Summon a 1/1 Silver Hand Recruit.",Paladin
+"Sir Annoy-O","Reinforce",2,"Summon a 1/1 Silver Hand Recruit.",Paladin
+"Anduin Wrynn","Lesser Heal",2,"Restore 2 Health.",Priest
+"Tyrande Whisperwind","Lesser Heal",2,"Restore 2 Health.",Priest
+"Madame Lazul","Lesser Heal",2,"Restore 2 Health.",Priest
+"Valeera Sanguinar","Dagger Mastery",2,"Equip a 1/2 Dagger.",Rogue
+"Maiev Shadowsong","Dagger Mastery",2,"Equip a 1/2 Dagger.",Rogue
+"Thrall","Totemic Call",2,"Summon a random Totem.",Shaman
+"Morgl the Oracle","Totemic Call",2,"Summon a random Totem.",Shaman
+"King Rastakhan","Totemic Call",2,"Summon a random Totem.",Shaman
+"The Thunder King","Totemic Call",2,"Summon a random Totem.",Shaman
+"Lady Vashj","Totemic Call",2,"Summon a random Totem.",Shaman
+"Gul'dan","Life Tap",2,"Draw a card and take 2 damage.",Warlock
+"Nemsy Necrofizzle","Life Tap",2,"Draw a card and take 2 damage.",Warlock
+"Mecha-Jaraxxus","Life Tap",2,"Draw a card and take 2 damage.",Warlock
+"N'Zoth","Life Tap",2,"Draw a card and take 2 damage.",Warlock
+"Jaraxxus","INFERNO!",2,"Summon a 6/6 Infernal.",Warlock
+"Garrosh Hellscream","Armor Up!",2,"Gain 2 Armor.",Warrior
+"Magni Bronzebeard","Armor Up!",2,"Gain 2 Armor.",Warrior
+"Deathwing","Armor Up!",2,"Gain 2 Armor.",Warrior
