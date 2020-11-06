@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+import csv
 
 class HSDB:
     """
@@ -70,9 +71,66 @@ class HSDB:
                 - Hero Power Text (str)
                 - Class (str)
         """
-
         # TODO: Create and populate tables: cards, minions, spells, weapons, classes, heroes, classcards
+        print("Creating Cards Table\n")
+        try:
+            sql = """CREATE TABLE Cards (
+                card_key decimal(4,0) PRIMARY KEY AUTOINCREMENT,
+                card_name varchar(25) not null,
+                card_cost decimal(2,0),
+                card_rarity varchar(10) not null,
+                card_type varchar(10) not null)"""
+            self.conn.execute(sql)
+            self.conn.commit()
+            print("Success!")
+        except Error as e:
+            self.conn.rollback()
+            print(e)
 
+        print ("Creating Heroes Table")
+        try:
+            sql = """CREATE TABLE Heroes (
+                hero_classkey decimal(2,0),
+                hero_name varchar(20) not null,
+                hero_power_cost decimal(2,0),
+                hero_power_text varchar(50)
+            )
+            """
+            self.conn.execute(sql)
+            self.conn.commit()
+            print("Success!")
+        except Error as e:
+            self.conn.rollback()
+            print(e)
+        
+        print("Starting to import data...")
+        print("Importing Cards data...")
+        try:
+            with open('data/cards.csv', 'r') as cardData:
+                cardReader = csv.reader(cardData, quoting=csv.QUOTE_ALL, skipinitialspace=True)
+                header = next(cardReader)
+                print("Header Format: {}".format(header))
+                #cards csv format ['Name', 'Type', 'Rarity', 'Cost', 'Attack', 'Health', 'Text', 'Classes']
+                for row in cardReader:
+                    print(row)
+                    self.insertCardToTable("Cards", row[0], row[3], row[2], row[1])
+
+            print("Done Reading In Cards Data")
+        except Error as e:
+            print(e)
+    
+    def insertCardToTable(self, table, card_name, card_cost, card_rarity, card_type):
+        print("Inserting card to table...")
+        try:
+            sql = """INSERT INTO {} (card_name, card_cost, card_rarity, card_type) VALUES(?,?,?,?)""".format(table)
+            args = [card_name, card_cost, card_rarity, card_type]
+            self.conn.execute(sql, args)
+            self.conn.commit()
+        except Error as e:
+            self.conn.rollback()
+            print(e)
+        #print("Done inserting card data to table...")
+        
     def drop_table(self, name):
         """
         Drop a table in the database.
