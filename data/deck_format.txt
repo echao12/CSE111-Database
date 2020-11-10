@@ -1,0 +1,9 @@
+Name [Deck Name]
+Class [Deck Class]
+Hero [Deck Hero]
+Card 1
+Card 2
+.
+.
+.
+Card 30

@@ -5,6 +5,11 @@ import csv
 class HSDB:
     """
     A class used to manage the Hearthstone database.
+
+    Attributes
+    ----------
+    conn : sqlite3.Connection
+        A connection to the database
     """
 
     def __init__(self):
@@ -75,7 +80,7 @@ class HSDB:
                 - Hero Power Text (str)
                 - Class (str)
         """
-        # TODO: Create and populate tables: cards, minions, spells, weapons, classes, heroes, classcards
+        # TODO: Create and populate tables: cards, minions, spells, weapons, classes, heroes, class_cards
         print("Creating Cards Table\n")
         try:
             sql = """CREATE TABLE cards (
@@ -241,11 +246,6 @@ class HSDB:
             print("ERROR reading/inserting weapon cards into weapons table")
         print("Completed weapons table generation...\n")
 
-
-
-
-
-
     def generateSpells(self):
         print("Begin generating spells table...")
         try:
@@ -286,7 +286,6 @@ class HSDB:
             print("ERROR reading/inserting spells into spell table")
         
         print("Completed spells table generation...\n")
-
 
     def generateMinions(self):
         print("Begin generating minions table...")
@@ -329,11 +328,7 @@ class HSDB:
             print("SUCCESS!")
         except Error as e:
             print(e)
-        print("Done generating minion table...\n")
-
-
-    
-                    
+        print("Done generating minion table...\n")                
 
     def generateClassCardsTable(self):
         #will match up cardkey to corresponding classkey
@@ -386,13 +381,6 @@ class HSDB:
         except Error as e:
             print(e)
         print("Finished generating class_card table!\n")
-
-                    
-                    
-
-
-
-
     
     #TODO: Need to finish vvv and classes table
     def insertHeroToTable(self, table, hero_name, hero_power_name, hero_power_cost, hero_power_text, hero_class):
@@ -431,7 +419,6 @@ class HSDB:
             self.conn.rollback()
             print(e)
         #print("Done inserting card data to table...")
-
         
     def drop_table(self, name):
         """
@@ -449,3 +436,304 @@ class HSDB:
         except Error as e:
             print("Error in drop_table:", e)
 
+    def check_card(self, card_name):
+        """
+        Return True if the given card exists in the database.
+
+        Parameters
+        ----------
+        card_name : str
+            The card name
+        """
+
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT * FROM cards WHERE card_name like ?", (card_name,))
+            return cursor.fetchone() is not None
+        except Error as e:
+            print("Error in check_card:", e)
+            return False
+
+    def check_class(self, class_name):
+        """
+        Return True if the given class exists in the database.
+
+        Parameters
+        ----------
+        class_name : str
+            The class name
+        """
+
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT * FROM classes WHERE class_name like ?", (class_name,))
+            return cursor.fetchone() is not None
+        except Error as e:
+            print("Error in check_class:", e)
+            return False
+
+    def check_hero(self, hero_name):
+        """
+        Return True if the given hero exists in the database.
+
+        Parameters
+        ----------
+        hero_name : str
+            The hero name
+        """
+
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT * FROM heroes WHERE hero_name like ?", (hero_name,))
+            return cursor.fetchone() is not None
+        except Error as e:
+            print("Error in check_hero:", e)
+            return False
+
+    def check_card_class(self, card_name, class_name):
+        """
+        Return True if the given class has access to the given card.
+
+        Parameters
+        ----------
+        card_name : str
+            The card name
+        class_name : str
+            The class name
+        """
+
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("""SELECT * FROM class_cards 
+                              INNER JOIN cards ON cc_cardkey=card_key
+                              INNER JOIN classes ON cc_classkey=class_key
+                              WHERE card_name like ? AND class_name like ?""", (card_name, class_name,))
+            return cursor.fetchone() is not None
+        except Error as e:
+            print("Error in check_card_class:", e)
+            return False
+
+    def get_cards(self, card_name=None, card_cost=None, card_rarity=None, card_type=None, class_name=None):
+        """
+        Return the name of all cards that match the given parameters.
+
+        Parameters
+        ----------
+        card_name : str
+            Full or partial card name
+        card_cost : int
+            Mana cost
+        card_rarity : str
+            Rarity, must be one of "Free", "Common", "Rare", "Epic", or "Legendary"
+        card_type : str
+            Type of card, must be one of "Minion", "Spell", or "Weapon"
+        class_name : str
+            Name of the class
+        """
+
+        try:
+            # Construct SQL query
+            sql_where = "WHERE"
+            sql_parameters = ()
+            
+            # card_name
+            if card_name is not None:
+                sql_where += " card_name like ?"
+                sql_parameters += ("%" + card_name + "%",)
+            
+            # card_cost
+            if card_cost is not None:
+                if len(sql_where) > 5:
+                    sql_where += " AND"
+                sql_where += " card_cost = ?"
+                sql_parameters += (card_cost,)
+
+            # card_rarity
+            if card_rarity is not None:
+                if len(sql_where) > 5:
+                    sql_where += " AND"
+                sql_where += " card_rarity = ?"
+                sql_parameters += (card_rarity,)
+
+            # card_type
+            if card_type is not None:
+                if len(sql_where) > 5:
+                    sql_where += " AND"
+                sql_where += " card_type = ?"
+                sql_parameters += (card_type,)
+
+            # class_name
+            if class_name is not None:
+                if len(sql_where) > 5:
+                    sql_where += " AND"
+                sql_where += " class_name like ?"
+                sql_parameters += (class_name,)
+
+            # Create cursor
+            cursor = self.conn.cursor()
+            
+            # Execute query
+            if len(sql_where) > 5:
+                cursor.execute("""SELECT DISTINCT card_name FROM cards
+                                  INNER JOIN class_cards ON card_key=cc_cardkey
+                                  INNER JOIN classes ON cc_classkey=class_key
+                                  """ + sql_where, sql_parameters)
+            else:
+                cursor.execute("SELECT card_name FROM cards")
+            
+            # Get all of the matching rows
+            result = cursor.fetchall()
+            
+            # Return result as a list (of card names)
+            return [res[0] for res in result]
+
+        except Error as e:
+            print("Error in get_cards:", e)
+            return []
+
+    def get_heroes(self, hero_name=None, class_name=None):
+        """
+        Return the name of all heroes that match the given parameters.
+
+        Parameters
+        ----------
+        hero_name : str
+            Full or partial hero name
+        class_name : str
+            Name of the class
+        """
+
+        try:
+            # Construct SQL query
+            sql_where = "WHERE"
+            sql_parameters = ()
+            
+            # hero_name
+            if hero_name is not None:
+                sql_where += " hero_name like ?"
+                sql_parameters += ("%" + hero_name + "%",)
+            
+            # class_name
+            if class_name is not None:
+                if len(sql_where) > 5:
+                    sql_where += " AND"
+                sql_where += " class_name like ?"
+                sql_parameters += (class_name,)
+
+            # Create cursor
+            cursor = self.conn.cursor()
+            
+            # Execute query
+            if len(sql_where) > 5:
+                cursor.execute("""SELECT hero_name FROM heroes
+                                  INNER JOIN classes ON hero_classkey=class_key
+                                  """ + sql_where, sql_parameters)
+            else:
+                cursor.execute("SELECT hero_name FROM heroes")
+            
+            # Get all of the matching rows
+            result = cursor.fetchall()
+            
+            # Return result as a list (of hero names)
+            return [res[0] for res in result]
+
+        except Error as e:
+            print("Error in get_heroes:", e)
+            return []
+
+    def get_hero_class(self, hero_name):
+        """
+        Return the class of the given hero.
+
+        Parameters
+        ----------
+        hero_name : str
+            The hero name
+        """
+
+        if self.check_hero(hero_name) == False:
+            print(hero_name, "does not exist in the database")
+            return None
+
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("""SELECT class_name FROM classes
+                              INNER JOIN heroes ON class_key=hero_classkey
+                              WHERE hero_name = ?""", (hero_name,))
+            return cursor.fetchone()[0]
+        except Error as e:
+            print("Error in get_hero_class:", e)
+            return None
+
+    def get_card_statistics(self, card_name):
+        """
+        Return the statistics of the given card.
+
+        Parameters
+        ----------
+        card_name : str
+            The card name
+        """
+
+        # Make sure the card exists in the database
+        if self.check_card(card_name) == False:
+            print(card_name, "does not exist in the database")
+            return None
+
+        try:
+            # Initialize an empty dictionary for the statistics
+            stats = {}
+
+            # Get the type of the card
+            cursor = self.conn.cursor()
+            cursor.execute("""SELECT card_type FROM cards
+                              WHERE card_name = ?""", (card_name,))
+            card_type = cursor.fetchone()[0]
+            stats["type"] = card_type
+            
+            if card_type == "Minion":
+                # Get all minion-related attributes
+                cursor.execute("""SELECT card_name, card_rarity, card_cost, minion_text, minion_attack, minion_health
+                                  FROM cards
+                                  INNER JOIN minions ON card_key = minion_cardkey
+                                  WHERE card_name = ?""", (card_name,))
+                card = cursor.fetchone()
+                stats["minion_name"] = card[0]
+                stats["minion_rarity"] = card[1]
+                stats["minion_cost"] = card[2]
+                stats["minion_text"] = card[3]
+                stats["minion_attack"] = card[4]
+                stats["minion_health"] = card[5]
+
+            elif card_type == "Spell":
+                # Get all spell-related attributes
+                cursor.execute("""SELECT card_name, card_rarity, card_cost, spell_text
+                                  FROM cards
+                                  INNER JOIN spells ON card_key = spell_cardkey
+                                  WHERE card_name = ?""", (card_name,))
+                card = cursor.fetchone()
+                stats["spell_name"] = card[0]
+                stats["spell_rarity"] = card[1]
+                stats["spell_cost"] = card[2]
+                stats["spell_text"] = card[3]
+            
+            elif card_type == "Weapon":
+                # Get all weapon-related attributes
+                cursor.execute("""SELECT card_name, card_rarity, card_cost, weapon_text, weapon_attack, weapon_durability
+                                  FROM cards
+                                  INNER JOIN weapons ON card_key = weapon_cardkey
+                                  WHERE card_name = ?""", (card_name,))
+                card = cursor.fetchone()
+                stats["weapon_name"] = card[0]
+                stats["weapon_rarity"] = card[1]
+                stats["weapon_cost"] = card[2]
+                stats["weapon_text"] = card[3]
+                stats["weapon_attack"] = card[4]
+                stats["weapon_durability"] = card[5]
+
+            # Return the statistics
+            return stats
+
+        except Error as e:
+            print("Error in get_card_statistics:", e)
+            return None

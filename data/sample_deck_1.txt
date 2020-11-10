@@ -1,0 +1,13 @@
+Name Sample Deck 1
+Class Mage
+Hero Medivh
+Mana Wyrm
+Mana Wyrm
+Frostbolt
+Frostbolt
+Counterspell
+Counterspell
+Flamestrike
+Flamestrike
+Archmage Antonidas
+Kazakus
