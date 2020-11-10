@@ -106,23 +106,21 @@ class HSDB:
                         sql = """INSERT INTO {} (class_name) VALUES(?)""".format("Classes")
                         print(sql)
                         args = [row[0]]
-                        print("before execute")
+                        #print("before execute")
                         self.conn.execute(sql, args)
-                        print("after execute")
+                        #print("after execute")
                         self.conn.commit()
-                    print("after commit")
+                    #print("after commit")
                 classData.close()
             except Error as e:
                 print("Error Opening classes.csv or inserting class to table")
+                self.conn.rollback()
                 print(e)
+
         except Error as e:
             print("Error Creating/Populating Class Table")
             print(e)
 
-                        
-        except Error as e:
-            print("Error creating Classes Table!")
-            print(e)
 
 
         print ("Creating Heroes Table")
@@ -130,6 +128,7 @@ class HSDB:
             sql = """CREATE TABLE Heroes (
                 hero_classkey integer,
                 hero_name varchar(20) not null,
+                hero_power_name varchar(15) not null,
                 hero_power_cost integer,
                 hero_power_text varchar(50)
             )
@@ -163,15 +162,42 @@ class HSDB:
             with open('data/heroes.csv', 'r') as heroData:
                 heroReader = csv.reader(heroData, quoting=csv.QUOTE_ALL, skipinitialspace=True)
                 header = next(heroReader)
-                #print("Header Format: {}".format(header))
+                print("Header Format: {}".format(header))
                 #heroes csv format ['Name', 'Hero Power Name', 'Hero Power Cost', 'Hero Power Text', 'Class']
-                #for row in heroReader:
-                    #print(row)
-                    #self.insertHeroToTable()
+                for row in heroReader:
+                    print(row)
+                    self.insertHeroToTable("Heroes", row[0], row[1], row[2], row[3], row[4])
             print("Done reading Hero data...")
         except Error as e:
             print(e)
+
     
+    #TODO: Need to finish vvv and classes table
+    def insertHeroToTable(self, table, hero_name, hero_power_name, hero_power_cost, hero_power_text, hero_class):
+        print("Inserting hero to table...")
+        try:
+            sql = """INSERT INTO {} (hero_classkey, hero_name, hero_power_name, hero_power_cost, hero_power_text) VALUES (?,?,?,?,?)""".format(table)
+            classKeyValSQL = """select class_key from Classes where class_name = '{}'""".format(hero_class)
+            print(sql)
+            try:
+                cur = self.conn.cursor()
+                cur.execute(classKeyValSQL) #extract the classkey from the classes database
+                classKeyVal = cur.fetchone()
+                classKeyVal = classKeyVal[0]#remove the ',' at the end
+                print("classkey for {} who is a {} is {}".format(hero_name, hero_class, classKeyVal))
+
+            except Error as e:
+                print("Error extracting class key for {}".format(hero_name))
+                print(e)
+
+            args = [classKeyVal, hero_name, hero_power_name, hero_power_cost, hero_power_text]
+            self.conn.execute(sql,args)
+            self.conn.commit()
+
+        except Error as e:
+            print("*Error inserting {} into hero table...".format(hero_name))
+            print(e)
+
     def insertCardToTable(self, table, card_name, card_cost, card_rarity, card_type):
         #print("Inserting card to table...")
         try:
@@ -183,12 +209,7 @@ class HSDB:
             self.conn.rollback()
             print(e)
         #print("Done inserting card data to table...")
-    
-    #TODO: Need to finish vvv and classes table
-    def insertHeroToTable(self, table, hero_name, hero_power_name, hero_power_text, hero_class):
-        print("Inserting hero to table...")
-        #try:
-        #    sql = """"INSERT INTO {} ("""
+
         
     def drop_table(self, name):
         """

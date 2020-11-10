@@ -12,7 +12,8 @@ def main():
 
     # Create tables
     #db.drop_table("Cards")
-    #db.drop_table("Heroes")
+    db.drop_table("Classes")
+    db.drop_table("Heroes")
     db.create_tables_from_data(cards, heroes)
 
     # Do stuff
