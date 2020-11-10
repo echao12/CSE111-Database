@@ -62,3 +62,25 @@ Name,Type,Rarity,Cost,Attack,Health,Text,Classes
 "Don Han'Cho",Minion,Legendary,7,5,6,"Battlecry: Give a random minion in your hand +5/+5.",Hunter|Paladin|Warrior
 "Aya Blackpaw",Minion,Legendary,6,5,3,"Battlecry and Deathrattle: Summon a Jade Golem.",Druid|Rogue|Shaman
 "Kazakus",Minion,Legendary,4,3,3,"Battlecry: If your deck has no duplicates, create a custom spell.",Mage|Priest|Warlock
+"Pyroblast",Spell,Epic,10,,,"Deal 10 damage.", Mage
+"Sea Giant",Minion,Epic,10,8,8,"Costs (1) less for each other minion on the battlefield",Neutral
+"Alexstrasza",Minion,Legendary,9,8,8,"Battlecry: Set a hero's remaining Health to 15.",Neutral
+"Frost Elemental",Minion,Common,6,5,5,"Battlecry: Freeze a character.",Neutral
+"Doomhammer",Weapon,Epic,5,2,8,"Windfury, Overload: (2)",Shaman
+"Stampeding Kodo",Minion,Rare,5,3,5,"Battlecry: Destroy a random enemy minion with 2 or less Attack.",Neutral
+"Stranglethorn Tiger",Minion,Common,5,5,5,"Stealth",Neutral
+"Mass Dispel",Spell,Rare,4,,,"Silence all enemy minions. Draw a card.",Priest
+"Cult Master",Minion,Common,4,4,2,"After a friendly minion dies, draw a card.",Neutral
+"Feral Spirit",Spell,Rare,3,,,"Summon two 2/3 Spirit Wolves with Taunt. Overload: (2)",Shaman
+"Far Sight",Spell,Epic,3,,,"Draw a card. That card costs (3) less.",Shaman
+"Deadly Shot",Spell,Common,3,,,"Destroy a random enemy minion.",Hunter
+"Lava Burst",Spell,Rare,3,,,"Deal 5 damage. Overload: (2)",Shaman
+"Lightning Storm",Spell,Rare,3,,,"Deal 2-3 damage to all enemy minions. Overload: (2)",Shaman
+"Mark of Nature",Spell,Common,3,,,"Choose One - Give a minion +4 Attack; or +4 Health and Taunt.",Druid
+"Mirror Entity",Spell,Common,3,,,"Secret: After your opponent plays a minion, summon a copy of it.",Mage
+"Brightwing",Minion,Legendary,3,3,2,"Battlecry: Add a random Legendary minion to your hand.",Neutral
+"King Mukla",Minion,Legendary,3,5,5,"Battlecry: Give your opponent 2 Bananas.",Neutral
+"Ironbeak Owl",Minion,Common,3,2,1,"Battlecry: Silence a minion.",Neutral
+"Scarlet Crusader",Minion,Common,3,3,1,"Divine Shield",Neutral
+"Unbound Elemental",Minion,Common,3,2,4,"Whenever you play a card with Overload, gain +1/+1.",Shaman
+"Stormforged Axe",Weapon,Common,2,2,3,"Overload: (1)",Shaman
