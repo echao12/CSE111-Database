@@ -75,7 +75,7 @@ class HSDB:
         print("Creating Cards Table\n")
         try:
             sql = """CREATE TABLE Cards (
-                card_key decimal(4,0) PRIMARY KEY AUTOINCREMENT,
+                card_key INTEGER PRIMARY KEY AUTOINCREMENT,
                 card_name varchar(25) not null,
                 card_cost decimal(2,0),
                 card_rarity varchar(10) not null,
@@ -86,6 +86,10 @@ class HSDB:
         except Error as e:
             self.conn.rollback()
             print(e)
+
+        #print("Creating Class Table")
+        #try:
+        #    self.create_table("Classes", "class_key, class_name")
 
         print ("Creating Heroes Table")
         try:
@@ -117,6 +121,21 @@ class HSDB:
 
             print("Done Reading In Cards Data")
         except Error as e:
+            self.conn.rollback()
+            print(e)
+        
+        print("Importing Heroes Data...")
+        try:
+            with open('data/heroes.csv', 'r') as heroData:
+                heroReader = csv.reader(heroData, quoting=csv.QUOTE_ALL, skipinitialspace=True)
+                header = next(heroReader)
+                print("Header Format: {}".format(header))
+                #heroes csv format ['Name', 'Hero Power Name', 'Hero Power Cost', 'Hero Power Text', 'Class']
+                for row in heroReader:
+                    print(row)
+                    #self.insertHeroToTable()
+            print("Done reading Hero data...")
+        except Error as e:
             print(e)
     
     def insertCardToTable(self, table, card_name, card_cost, card_rarity, card_type):
@@ -130,6 +149,12 @@ class HSDB:
             self.conn.rollback()
             print(e)
         #print("Done inserting card data to table...")
+    
+    #TODO: Need to finish vvv and classes table
+    def insertHeroToTable(self, table, hero_name, hero_power_name, hero_power_text, hero_class):
+        print("Inserting hero to table...")
+        #try:
+        #    sql = """"INSERT INTO {} ("""
         
     def drop_table(self, name):
         """

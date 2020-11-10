@@ -11,6 +11,8 @@ def main():
     db.connect('data/hs.sqlite')
 
     # Create tables
+    #db.drop_table("Cards")
+    #db.drop_table("Heroes")
     db.create_tables_from_data(cards, heroes)
 
     # Do stuff
