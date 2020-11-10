@@ -45,6 +45,9 @@ class HSDB:
         except Error as e:
             print("Error in create_table:", e)
 
+    #TODO: Link the individual table creations to use the create_table() fn to prevent overwrite each time we run
+    #and then have them individually populate when needed
+    #for now, we just gatta make it work lol
     def create_tables_from_data(self, cards, heroes):
         """
         Create tables from a given data.
@@ -104,7 +107,7 @@ class HSDB:
                     #note: classes csv format: class_name
                     for row in classReader:
                         sql = """INSERT INTO {} (class_name) VALUES(?)""".format("Classes")
-                        print(sql)
+                        #print(sql)
                         args = [row[0]]
                         #print("before execute")
                         self.conn.execute(sql, args)
@@ -152,7 +155,7 @@ class HSDB:
                     #print(row)
                     self.insertCardToTable("Cards", row[0], row[3], row[2], row[1])
 
-            print("Done Reading In Cards Data")
+            print("Done Reading In Cards Data\n")
         except Error as e:
             self.conn.rollback()
             print(e)
@@ -165,26 +168,89 @@ class HSDB:
                 print("Header Format: {}".format(header))
                 #heroes csv format ['Name', 'Hero Power Name', 'Hero Power Cost', 'Hero Power Text', 'Class']
                 for row in heroReader:
-                    print(row)
+                    #print(row)
                     self.insertHeroToTable("Heroes", row[0], row[1], row[2], row[3], row[4])
-            print("Done reading Hero data...")
+            print("Done reading/inserting Hero data...\n")
         except Error as e:
             print(e)
+
+        print("Creating all relational tables for Cards/Heroes...\n")
+        print("Generating class_cards Table")
+        try:
+            self.generateClassCardsTable()
+        except Error as e:
+            print("ERROR in generating class_cards Table!")
+            print(e)
+        
+    def generateClassCardsTable(self):
+        #will match up cardkey to corresponding classkey
+        #must open cards.csv to get class name
+        #fetch card name and card class from .csv getch card key from Cards & fetch class key from Classes
+        try:
+            self.create_table("class_cards", ["cc_cardkey integer", "cc_classkey integer"])
+        except Error as e:
+            print("ERROR in creating class_cards")
+            print(e)
+        
+        try:
+            with open('data/cards.csv', 'r') as cardData:
+                cardReader = csv.reader(cardData, quoting=csv.QUOTE_ALL, skipinitialspace=True)
+                header = next(cardReader)
+                #cards csv format ['Name', 'Type', 'Rarity', 'Cost', 'Attack', 'Health', 'Text', 'Classes']
+                for card in cardReader:
+                    card_name = card[0]
+                    card_classes = card[7].split("|")
+                    #print("got card class/name")
+                    sql = '''select card_key from Cards where card_name = "{}"'''.format(card_name)
+                    cur = self.conn.cursor()
+                    cur.execute(sql) #get card_key from cards table
+                    values = cur.fetchone()
+                    card_key = values[0]
+                    #print("got card key")
+                    #print("Class Key Values:")
+                    for card_class in card_classes:
+                        sql = '''select class_key from Classes where class_name = "{}"'''.format(card_class)
+                        cur = self.conn.cursor()
+                        cur.execute(sql)
+                        card_class_val = cur.fetchone()
+                        #print(card_class_val[0])
+                    #for cardclass in cardclasses:
+                    #    print(cardclass)
+                    #card_classkey = values[0]
+                        #print("got card class key")
+                        #print("card name: {} | card key: {} | class: {} | classkey: {}\n".format(card_name, card_key, card_class, card_class_val[0]))
+                        try:
+                            sql = '''Insert into {} (cc_cardkey, cc_classkey) values ({},{})'''.format('class_cards', card_key, card_class_val[0])
+                            #print(sql)
+                            self.conn.execute(sql)
+                            self.conn.commit()
+                        except Error as e:
+                            print("Failed to insert class_cards entry for {}".format(card_name))
+            cardData.close()
+        except Error as e:
+            print(e)
+        print("Finished generating class_card table!")
+
+                    
+                    
+
+
+
 
     
     #TODO: Need to finish vvv and classes table
     def insertHeroToTable(self, table, hero_name, hero_power_name, hero_power_cost, hero_power_text, hero_class):
-        print("Inserting hero to table...")
+        #print("Inserting hero {} to table...".format(hero_name))
         try:
             sql = """INSERT INTO {} (hero_classkey, hero_name, hero_power_name, hero_power_cost, hero_power_text) VALUES (?,?,?,?,?)""".format(table)
             classKeyValSQL = """select class_key from Classes where class_name = '{}'""".format(hero_class)
-            print(sql)
+            #print(sql)
             try:
                 cur = self.conn.cursor()
                 cur.execute(classKeyValSQL) #extract the classkey from the classes database
                 classKeyVal = cur.fetchone()
                 classKeyVal = classKeyVal[0]#remove the ',' at the end
-                print("classkey for {} who is a {} is {}".format(hero_name, hero_class, classKeyVal))
+                #print("classkey for {} who is a {} is {}".format(hero_name, hero_class, classKeyVal))
 
             except Error as e:
                 print("Error extracting class key for {}".format(hero_name))

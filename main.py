@@ -14,7 +14,9 @@ def main():
     #db.drop_table("Cards")
     db.drop_table("Classes")
     db.drop_table("Heroes")
+    #this will generate the base Heroes, Classes, Cards, and other related tables for use.
     db.create_tables_from_data(cards, heroes)
+    
 
     # Do stuff
 
