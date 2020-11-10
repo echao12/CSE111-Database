@@ -40,6 +40,7 @@ class HSDB:
 
         try:
             sql_statement = "CREATE TABLE IF NOT EXISTS " + name + " (" + ", ".join(fields) + ");"
+            print("sql = {}".format(sql_statement))
             self.conn.execute(sql_statement)
         except Error as e:
             print("Error in create_table:", e)
@@ -77,7 +78,7 @@ class HSDB:
             sql = """CREATE TABLE Cards (
                 card_key INTEGER PRIMARY KEY AUTOINCREMENT,
                 card_name varchar(25) not null,
-                card_cost decimal(2,0),
+                card_cost integer,
                 card_rarity varchar(10) not null,
                 card_type varchar(10) not null)"""
             self.conn.execute(sql)
@@ -87,16 +88,49 @@ class HSDB:
             self.conn.rollback()
             print(e)
 
-        #print("Creating Class Table")
-        #try:
-        #    self.create_table("Classes", "class_key, class_name")
+        print("Creating Class Table")
+        try:
+            args = ["class_key integer primary key autoincrement","class_name varchar(15) not null"]
+            #self.create_table("Classes", "class_key primary key autoincrement, class_name varchar(15) not null")
+            self.create_table("Classes", args)
+            print("Populating Classes Table")
+            try:
+                with open('data/classes.csv', 'r') as classData:
+                    classReader = csv.reader(classData, quoting=csv.QUOTE_ALL, skipinitialspace=True)
+                    header = next(classReader)
+                    print("Header Format: {}".format(header))
+                    #sql = """INSERT INTO {} (class_name) VALUES (?)""".format("Classes")
+                    #print(sql)
+                    #note: classes csv format: class_name
+                    for row in classReader:
+                        sql = """INSERT INTO {} (class_name) VALUES(?)""".format("Classes")
+                        print(sql)
+                        args = [row[0]]
+                        print("before execute")
+                        self.conn.execute(sql, args)
+                        print("after execute")
+                        self.conn.commit()
+                    print("after commit")
+                classData.close()
+            except Error as e:
+                print("Error Opening classes.csv or inserting class to table")
+                print(e)
+        except Error as e:
+            print("Error Creating/Populating Class Table")
+            print(e)
+
+                        
+        except Error as e:
+            print("Error creating Classes Table!")
+            print(e)
+
 
         print ("Creating Heroes Table")
         try:
             sql = """CREATE TABLE Heroes (
-                hero_classkey decimal(2,0),
+                hero_classkey integer,
                 hero_name varchar(20) not null,
-                hero_power_cost decimal(2,0),
+                hero_power_cost integer,
                 hero_power_text varchar(50)
             )
             """
@@ -116,7 +150,7 @@ class HSDB:
                 print("Header Format: {}".format(header))
                 #cards csv format ['Name', 'Type', 'Rarity', 'Cost', 'Attack', 'Health', 'Text', 'Classes']
                 for row in cardReader:
-                    print(row)
+                    #print(row)
                     self.insertCardToTable("Cards", row[0], row[3], row[2], row[1])
 
             print("Done Reading In Cards Data")
@@ -129,17 +163,17 @@ class HSDB:
             with open('data/heroes.csv', 'r') as heroData:
                 heroReader = csv.reader(heroData, quoting=csv.QUOTE_ALL, skipinitialspace=True)
                 header = next(heroReader)
-                print("Header Format: {}".format(header))
+                #print("Header Format: {}".format(header))
                 #heroes csv format ['Name', 'Hero Power Name', 'Hero Power Cost', 'Hero Power Text', 'Class']
-                for row in heroReader:
-                    print(row)
+                #for row in heroReader:
+                    #print(row)
                     #self.insertHeroToTable()
             print("Done reading Hero data...")
         except Error as e:
             print(e)
     
     def insertCardToTable(self, table, card_name, card_cost, card_rarity, card_type):
-        print("Inserting card to table...")
+        #print("Inserting card to table...")
         try:
             sql = """INSERT INTO {} (card_name, card_cost, card_rarity, card_type) VALUES(?,?,?,?)""".format(table)
             args = [card_name, card_cost, card_rarity, card_type]
