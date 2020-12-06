@@ -22,8 +22,9 @@ class App:
             print("[3] Edit existing deck")
             print("[4] Delete deck")
             print("[5] Create deck from text file")
-            print("[6] Create random deck")
-            print("[7] Search for cards")
+            print("[6] Save deck to file")
+            print("[7] Create random deck")
+            print("[8] Search for cards")
             print("[0] Exit the application")
             print("")
             key = input("Please select your action: ")
@@ -49,8 +50,10 @@ class App:
             elif key == 5:
                 self.create_deck_from_txt()
             elif key == 6:
-                self.create_random_deck()
+                self.save_deck_to_file()
             elif key == 7:
+                self.create_random_deck()
+            elif key == 8:
                 self.search_cards()
             elif key == 0:
                 print("Exiting application...")
@@ -250,6 +253,46 @@ class App:
                     print(new_deck)
             else:
                 print("Failed to create deck")
+
+    def save_deck_to_file(self):
+        deck_name = input("Please enter the name of the deck you want to save: ")
+        deck_name = deck_name.strip()
+        print("")
+
+        for deck in self.decks:
+            if deck_name == deck.name:
+                if deck.hero is None or len(deck.cards) == 0:
+                    print("Deck is incomplete")
+                    return
+
+                filename = input("Enter the name of the file (recommended to use .txt): ")
+                filename = filename.strip()
+                print("")
+
+                if os.path.isfile(filename):
+                    ok = input("File already exists. Overwrite (yes/no)? ")
+                    ok = ok.strip().lower()
+                    print("")
+
+                    if ok != "yes" and ok != "y" and ok != "ok":
+                        print("Returning to main menu")
+                        return
+
+                try:
+                    with open(filename, 'w') as f:
+                        f.write("Name {}\n".format(deck.name))
+                        f.write("Class {}\n".format(deck.hero_class))
+                        f.write("Hero {}\n".format(deck.hero))
+                        for card in deck.cards:
+                            f.write(card + "\n")
+
+                        print(deck_name, "is successfully saved to", filename)
+                except:
+                    print("Error: Unable to save deck to", filename)
+                
+                return
+
+        print("Deck not found")
 
     def create_random_deck(self):
         new_deck = Deck(self.db)
