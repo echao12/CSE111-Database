@@ -15,17 +15,12 @@ def main():
     db.drop_table("Cards")
     db.drop_table("Classes")
     db.drop_table("Heroes")
-
-    
-    db.drop_table("spells")
     db.drop_table("minions")
-    db.drop_table("class_cards")
+    db.drop_table("spells")
     db.drop_table("weapons")
+    db.drop_table("class_cards")
     db.drop_table("keywords")
     db.drop_table("keyword_cards")
-    #db.generateMinions() #testing minion table generation
-    #db.generateSpells() #testing spell table generation
-    #db.generateWeapons() #testing weapon table generation
 
     # this fn will generate and populate Heroes, Classes, Cards, and other related tables
     # for use from the cards/classes/heroes csv files.

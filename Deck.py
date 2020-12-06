@@ -96,7 +96,6 @@ class Deck:
                 print(card, "does not fit the deck's class")
                 return False
 
-        # TODO? Implement card limit based on the rarity of the card
         self.cards = [card for card in cards]
 
         return True
@@ -123,7 +122,6 @@ class Deck:
             print(card_name, "does not fit the class of the deck")
             return False
 
-        # TODO? Implement card limit based on the rarity of the card
         self.cards.append(card_name)
         
         return True
@@ -200,24 +198,36 @@ class Deck:
         return deck_stats
 
     def print_deck_statistics(self):
+        """
+        Print deck statistics in a nice format.
+        """
+
         if self.name is None or self.hero is None or self.hero_class is None or len(self.cards) == 0:
             print("Deck is incomplete")
         else:
             stats = self.get_deck_statistics()
+
+            # General overview of the deck
             print("Deck Statistics")
             print("Hero:", stats["hero_name"])
             print("Class:", stats["class_name"])
             print("Number of cards:", stats["num_cards"])
             print("")
+            
+            # Number of minions, spells, and weapons in the deck
             print("{:<7} {:<7} {:<7} {:<7}".format("Type", "Minion", "Spell", "Weapon"))
             print("{:<7} {:<7} {:<7} {:<7}".format("Count", stats["num_minions"], stats["num_spells"], stats["num_weapons"]))
             print("")
+
+            # Mana curve of all the cards in the deck
             for i in range(max(stats["mana_curve"]), 0, -1):
                 asterisks = ["*" if count >= i else "" for count in stats["mana_curve"]]
                 print("{:<6} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4}".format("", *asterisks))
             print("{:<6} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4}".format("Mana", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "11+"))
             print("{:<6} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4}".format("Count", *stats["mana_curve"]))
             print("")
+
+            # Number of cards of each rarity
             print("{:<8} {:<8} {:<8} {:<8} {:<8} {:<10}".format("Rarity", "Free", "Common", "Rare", "Epic", "Legendary"))
             print("{:<8} {:<8} {:<8} {:<8} {:<8} {:<8}".format("Count", stats["rarity_count"]["Free"], stats["rarity_count"]["Common"], stats["rarity_count"]["Rare"], stats["rarity_count"]["Epic"], stats["rarity_count"]["Legendary"]))
             print("")
@@ -270,7 +280,6 @@ class Deck:
             # Choose a random card
             random_card = random.choice(valid_cards)
 
-            # TODO? Implement card limit based on the rarity of the card
             self.cards.append(random_card)
 
     def generate_deck_from_text_file(self, textfile):
@@ -321,8 +330,6 @@ class Deck:
                 if len(card_names) > 30:
                     print("Too many cards in deck")
                     return False
-
-                # TODO? Implement card limit based on the rarity of the card
 
                 # Everything is valid, replace deck information
                 self.name = deck_name

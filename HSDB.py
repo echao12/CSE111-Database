@@ -50,9 +50,6 @@ class HSDB:
         except Error as e:
             print("Error in create_table:", e)
 
-    #TODO: Link the individual table creations to use the create_table() fn to prevent overwrite each time we run
-    #and then have them individually populate when needed
-    #for now, we just gatta make it work lol
     def create_tables_from_data(self, cards, heroes):
         """
         Create tables from a given data.
@@ -80,7 +77,7 @@ class HSDB:
                 - Hero Power Text (str)
                 - Class (str)
         """
-        # TODO: Create and populate tables: cards, minions, spells, weapons, classes, heroes, class_cards
+        
         print("Creating Cards Table\n")
         try:
             sql = """CREATE TABLE cards (
@@ -427,7 +424,6 @@ class HSDB:
             print(e)
         print("Finished generating class_card table!\n")
     
-    #TODO: Need to finish vvv and classes table
     def insertHeroToTable(self, table, hero_name, hero_power_name, hero_power_cost, hero_power_text, hero_class):
         #print("Inserting hero {} to table...".format(hero_name))
         try:
