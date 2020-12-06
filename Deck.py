@@ -120,7 +120,7 @@ class Deck:
             print(card_name, "is not a valid card")
             return False
 
-        if self.db.check_card_class(card_name, self.hero_class) is False:
+        if self.db.check_neutral(card_name) is False and self.db.check_card_class(card_name, self.hero_class) is False:
             print(card_name, "does not fit the class of the deck")
             return False
 
@@ -268,7 +268,7 @@ class Deck:
             self.set_hero(random.choice(valid_heroes))
 
         # Set cards
-        valid_cards = self.db.get_cards(class_name=self.hero_class)
+        valid_cards = self.db.get_cards(class_name=self.hero_class) + self.db.get_cards(class_name="Neutral")
         while len(self.cards) < card_count:
             # Choose a random card
             random_card = random.choice(valid_cards)
@@ -316,7 +316,7 @@ class Deck:
                     if self.db.check_card(card_name) == False:
                         print("Invalid card:", card_name)
                         return False
-                    elif self.db.check_card_class(card_name, hero_class) == False:
+                    elif self.db.check_neutral(card_name) == False and self.db.check_card_class(card_name, hero_class) == False:
                         print("Invalid card (wrong class):", card_name)
                         return False
                     card_names.append(card_name)

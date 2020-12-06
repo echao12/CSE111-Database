@@ -582,6 +582,18 @@ class HSDB:
             print("Error in check_card_class:", e)
             return False
 
+    def check_neutral(self, card_name):
+        """
+        Return True if the given card is a neutral card.
+
+        Parameters
+        ----------
+        card_name : str
+            The card name
+        """
+
+        return self.check_card_class(card_name, "Neutral")
+
     def get_cards(self, card_name=None, card_cost=None, card_rarity=None, card_type=None, class_name=None):
         """
         Return the name of all cards that match the given parameters.
