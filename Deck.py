@@ -112,29 +112,36 @@ class Deck:
             print("Deck does not have a hero")
             return False
 
-        if len(cards) == 30:
+        if len(self.cards) == 30:
             print("Deck is full")
             return False
 
-        if self.db.check_card(card) is False:
-            print(card, "is not a valid card")
+        if self.db.check_card(card_name) is False:
+            print(card_name, "is not a valid card")
             return False
 
-        if self.db.check_card_class(card, self.hero_class) is False:
-            print(card, "does not fit the decks'class")
+        if self.db.check_card_class(card_name, self.hero_class) is False:
+            print(card_name, "does not fit the class of the deck")
             return False
 
         # TODO? Implement card limit based on the rarity of the card
-        self.cards.append(card)
+        self.cards.append(card_name)
         
         return True
 
-    def remove_card(self, card):
+    def remove_card(self, card_name):
         """
         Remove a card from the deck.
         """
 
-        self.cards.remove(card)
+        self.cards.remove(card_name)
+
+    def check_card(self, card_name):
+        """
+        Check if a card is in the deck.
+        """
+
+        return card_name in self.cards
 
     def get_deck_statistics(self):
         """
@@ -193,6 +200,29 @@ class Deck:
 
         return deck_stats
 
+    def print_deck_statistics(self):
+        if self.name is None or self.hero is None or self.hero_class is None or len(self.cards) == 0:
+            print("Deck is incomplete")
+        else:
+            stats = self.get_deck_statistics()
+            print("Deck Statistics")
+            print("Hero:", stats["hero_name"])
+            print("Class:", stats["class_name"])
+            print("Number of cards:", stats["num_cards"])
+            print("")
+            print("{:<7} {:<7} {:<7} {:<7}".format("Type", "Minion", "Spell", "Weapon"))
+            print("{:<7} {:<7} {:<7} {:<7}".format("Count", stats["num_minions"], stats["num_spells"], stats["num_weapons"]))
+            print("")
+            for i in range(max(stats["mana_curve"]), 0, -1):
+                asterisks = ["*" if count >= i else "" for count in stats["mana_curve"]]
+                print("{:<6} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4}".format("", *asterisks))
+            print("{:<6} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4}".format("Mana", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "11+"))
+            print("{:<6} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4}".format("Count", *stats["mana_curve"]))
+            print("")
+            print("{:<8} {:<8} {:<8} {:<8} {:<8} {:<10}".format("Rarity", "Free", "Common", "Rare", "Epic", "Legendary"))
+            print("{:<8} {:<8} {:<8} {:<8} {:<8} {:<8}".format("Count", stats["rarity_count"]["Free"], stats["rarity_count"]["Common"], stats["rarity_count"]["Rare"], stats["rarity_count"]["Epic"], stats["rarity_count"]["Legendary"]))
+            print("")
+
     def randomize(self, name=None, hero=None, hero_class=None, card_count=30):
         """
         Randomize the content of the deck.
@@ -216,7 +246,7 @@ class Deck:
             for _ in range(3):
                 self.name += random.choice(string.ascii_uppercase)
             self.name += " "
-            self.name += str(random.randint(1,1000000))
+            self.name += str(random.randint(1,1000))
 
         # Set deck hero
         if hero is not None:
@@ -235,8 +265,7 @@ class Deck:
                 valid_heroes = self.db.get_heroes()
             
             # Choose a random hero and also set the class
-            self.hero = random.choice(valid_heroes)
-            self.hero_class = self.db.get_hero_class(self.hero)
+            self.set_hero(random.choice(valid_heroes))
 
         # Set cards
         valid_cards = self.db.get_cards(class_name=self.hero_class)

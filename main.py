@@ -1,6 +1,6 @@
 import pandas as pd
 from HSDB import HSDB
-from Deck import Deck
+from App import App
 
 def main():
     # Read in the data
@@ -31,28 +31,9 @@ def main():
     # for use from the cards/classes/heroes csv files.
     db.create_tables_from_data(cards, heroes)
 
-    #Generate sample deck from text file
-    sample_deck = Deck(db)
-    sample_deck.generate_deck_from_text_file("data/sample_deck_1.txt")
-    print("Sample Deck:")
-    print(sample_deck)
-    
-    # Print sample deck statistics
-    sample_deck_stats = sample_deck.get_deck_statistics()
-    for key in sample_deck_stats:
-        print(key, sample_deck_stats[key])
-    print("\n")
-
-    # Generate random deck
-    print("Random Deck:")
-    random_deck = Deck(db)
-    random_deck.randomize()
-    print(random_deck)
-    
-    # Print random deck statistics
-    random_deck_stats = random_deck.get_deck_statistics()
-    for key in random_deck_stats:
-        print(key, random_deck_stats[key])
+    # Start the application
+    app = App(db)
+    app.run()
 
 if __name__ == '__main__':
     main()
