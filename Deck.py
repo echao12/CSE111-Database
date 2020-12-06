@@ -1,4 +1,3 @@
-import string
 import random
 
 class Deck:
@@ -238,16 +237,6 @@ class Deck:
             otherwise choose a random class
         """
 
-        # Set deck name
-        if name is not None:
-            self.name = name
-        else:
-            self.name = ""
-            for _ in range(3):
-                self.name += random.choice(string.ascii_uppercase)
-            self.name += " "
-            self.name += str(random.randint(1,1000))
-
         # Set deck hero
         if hero is not None:
             if self.set_hero(hero) == False:
@@ -266,6 +255,14 @@ class Deck:
             
             # Choose a random hero and also set the class
             self.set_hero(random.choice(valid_heroes))
+
+        # Set deck name
+        if name is not None:
+            self.name = name
+        else:
+            self.name = self.hero_class
+            self.name += " "
+            self.name += str(random.randint(1,10000))
 
         # Set cards
         valid_cards = self.db.get_cards(class_name=self.hero_class) + self.db.get_cards(class_name="Neutral")
