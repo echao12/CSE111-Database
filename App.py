@@ -39,6 +39,7 @@ class App:
             print("[6] Save deck to file")
             print("[7] Create random deck")
             print("[8] Search for cards")
+            print("[9] Search for cards by keywords")
             print("[0] Exit the application")
             print("")
 
@@ -82,6 +83,9 @@ class App:
             elif key == 8:
                 self.search_cards()
             
+            elif key == 9:
+                self.search_by_keywords()
+
             elif key == 0:
                 print("Exiting application...")
                 running = False
@@ -523,3 +527,23 @@ class App:
             print(len(search_results), "cards found")
             for card in search_results:
                 print(card)
+
+    def search_by_keywords(self):
+        user_entry = ""
+        keywordsList = []
+        while(user_entry != '~'):
+            user_entry = input("Enter Keyword(s) individually (Enter '~' to continue): ")
+            #check for escape sequence
+            if(user_entry == "~"):
+                break
+            user_entry = self.db.check_keyword(user_entry)
+            if user_entry != None:
+                keywordsList.append(user_entry[0])
+            else:
+                print("Keyword does not exist")
+        print("Search parameters:")
+        for keyword in keywordsList:
+            print(keyword)
+
+        search_results = self.db.viewCardsByKeyword(keywordsList)
+        print("found {} matches".format(len(search_results)))

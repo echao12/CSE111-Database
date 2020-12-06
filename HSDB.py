@@ -590,6 +590,19 @@ class HSDB:
 
         return self.check_card_class(card_name, "Neutral")
 
+    def check_keyword(self, keyword):
+        #will return the keyword if it matches, None if no match
+        result = None
+        try:
+            sql = '''select keyword_name from keywords where keyword_name = "{}"'''.format(keyword)
+            cur = self.conn.cursor()
+            cur.execute(sql)
+            result = cur.fetchone()
+        except Error as e:
+            print(e)
+        
+        return result
+
     def get_cards(self, card_name=None, card_cost=None, card_rarity=None, card_type=None, class_name=None):
         """
         Return the name of all cards that match the given parameters.
@@ -814,3 +827,32 @@ class HSDB:
         except Error as e:
             print("Error in get_card_statistics:", e)
             return None
+            
+    def viewCardsByKeyword(self, keywords):
+        print("Checking for cards with these keywords: {}".format(keywords))
+        cardList = []
+        try:
+            cursor = self.conn.cursor()
+            for keyword in keywords:
+                print("Searching for keyword: {}".format(keyword))
+                sql = '''select cardkey, card_name, text, keyword_name, keyword_description 
+                            from keywords, keyword_cards, (select minion_cardkey as cardkey, card_name,  minion_text as text from minions, cards on minion_cardkey = card_key
+                                                            UNION
+                                                            select spell_cardkey, card_name, spell_text from spells, cards on spell_cardkey = card_key
+                                                            UNION
+                                                            select weapon_cardkey, card_name, weapon_text from weapons, cards on weapon_cardkey = card_key
+                                                            )
+                            on cardkey = keyword_cards.card_key and keywords.keyword_key = keyword_cards.keyword_key
+                            where keyword_name = "{}"'''.format(keyword)
+                #print(sql)
+                cursor.execute(sql)
+                for row in cursor:
+                    cardList.append(row)
+            print("Search Results:")
+            print("{:<10} {:<25} {:<125} {:<15}".format("card_key","card_name", "card_text", "keyword"))
+            for card in cardList:
+                #print(card[0])
+                print("{:<10} {:<25} {:<125} {:<15}".format(card[0], card[1], card[2], card[3]))
+        except Error as e:
+            print(e)
+        return cardList
