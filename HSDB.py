@@ -148,6 +148,42 @@ class HSDB:
             self.conn.rollback()
             print(e)
         
+        print ("Creating keywords Table")
+        try:
+            sql = """CREATE TABLE keywords (
+                keyword_key INTEGER PRIMARY KEY AUTOINCREMENT,
+                keyword_name varchar(10) unique not null,
+                keyword_description varchar(25) not null
+            )
+            """
+            self.conn.execute(sql)
+            self.conn.commit()
+            #print("Success!")
+        except Error as e:
+            self.conn.rollback()
+            print(e)
+        try:
+            with open('data/keywords.csv', 'r') as keyword_data:
+                keyword_reader = csv.reader(keyword_data, quoting=csv.QUOTE_ALL, skipinitialspace=True)
+                header = next(keyword_reader)
+                print("Header Format: {}".format(header))
+                for row in keyword_reader:
+                    try:
+                        cur = self.conn.cursor()
+                        sql = '''insert into keywords (keyword_name, keyword_description) values (?,?)'''
+                        args = [row[0], row[1]]
+                        cur.execute(sql, args)
+                    except Error as e:
+                        print("Error inserting keyword {} into keywords table.".format(row[0]))
+                        print(e)
+                        self.conn.rollback()
+            keyword_data.close()
+        except Error as e:
+            self.conn.rollback()
+            print("Error with keyword table creation.")
+            print(e)
+        
+        
         print("Starting to import data...")
         print("Importing cards data...")
         try:
@@ -181,8 +217,14 @@ class HSDB:
             print(e)
 
         print("Creating all relational tables for cards/heroes...\n")
-        print("Generating class_cards Table")
         try:
+            print("Creating keyword_cards table")
+            self.create_table('keyword_cards', ['keyword_key integer', 'card_key integer'])
+        except Error as e:
+            print("Error creating keyword_cards table")
+            print(e)
+        try:
+            print("Generating class_cards Table")
             self.generateClassCardsTable()
         except Error as e:
             print("ERROR in generating class_cards Table!")
@@ -236,6 +278,7 @@ class HSDB:
                             #print(sql)
                             self.conn.execute(sql, args)
                             self.conn.commit()
+                            self.checkForKeywords(weapon_cardkey, weapon_text)
                         except Error as e:
                             self.conn.rollback()
                             print("Error inserting weapon {} into weapons table".format(card[0]))
@@ -276,6 +319,7 @@ class HSDB:
                             #print(sql)
                             self.conn.execute(sql, args)
                             self.conn.commit()
+                            self.checkForKeywords(spell_cardkey, spell_text)
                         except Error as e:
                             self.conn.rollback()
                             print("Error inserting spell {} into spells table".format(card[0]))
@@ -320,6 +364,7 @@ class HSDB:
                             args = [cardkey, attack, health, text]
                             self.conn.execute(sql, args)
                             self.conn.commit()
+                            self.checkForKeywords(cardkey, text)
                         except Error as e:
                             print("ERROR inserting {} into minion table...".format(card[0]))
                             self.conn.rollback()
@@ -419,6 +464,30 @@ class HSDB:
             self.conn.rollback()
             print(e)
         #print("Done inserting card data to table...")
+    def checkForKeywords(self, card_key, card_text):
+        try:
+            sql = '''select keyword_key, keyword_name from keywords'''
+            cur = self.conn.cursor()
+            cur.execute(sql)
+            keywords = cur.fetchall()
+            for keyword in keywords:
+                #0->key 1->name
+                if keyword[1] in card_text:
+                    try:
+                        print("matching keyword {} - {} - with card_key {}".format(keyword[0], keyword[1], card_key))
+                        sql = '''insert into keyword_cards values (?,?)'''
+                        args = [keyword[0], card_key]
+                        self.conn.execute(sql, args)
+                    except Error as e:
+                        print("Error inserting a keyword-card_key pair for word:{} card:{}".format(keyword[1], card_key))
+                        print(e)
+                else:
+                    pass
+            self.conn.commit()
+        except Error as e:
+            self.conn.rollback()
+            print("Error in keyword search/insert for card {}".format(card_key))
+            print(e)
         
     def drop_table(self, name):
         """

@@ -21,6 +21,8 @@ def main():
     db.drop_table("minions")
     db.drop_table("class_cards")
     db.drop_table("weapons")
+    db.drop_table("keywords")
+    db.drop_table("keyword_cards")
     #db.generateMinions() #testing minion table generation
     #db.generateSpells() #testing spell table generation
     #db.generateWeapons() #testing weapon table generation
@@ -29,7 +31,7 @@ def main():
     # for use from the cards/classes/heroes csv files.
     db.create_tables_from_data(cards, heroes)
 
-    # Generate sample deck from text file
+    #Generate sample deck from text file
     sample_deck = Deck(db)
     sample_deck.generate_deck_from_text_file("data/sample_deck_1.txt")
     print("Sample Deck:")
