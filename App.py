@@ -3,8 +3,9 @@ from Deck import Deck
 
 class App:
     """
-    TODO: Formatting
     TODO: Documentation
+    TODO: Formatting
+    TODO: Helpful comments
     """
 
     def __init__(self, db):
@@ -50,7 +51,7 @@ class App:
             elif key == 6:
                 self.create_random_deck()
             elif key == 7:
-                print("Function not implemented")
+                self.search_cards()
             elif key == 0:
                 print("Exiting application...")
                 running = False
@@ -276,4 +277,71 @@ class App:
             else:
                 accept = True
                 print("Invalid input")
-            
+    
+    def search_cards(self):
+        card_name = input("Enter full/partial card name (press Enter to skip): ")
+        card_name = card_name.strip()
+        print("")
+
+        if card_name == "":
+            card_name = None
+
+        card_cost = input("Enter mana cost (press Enter to skip): ")
+        card_cost = card_cost.strip()
+        print("")
+
+        if card_cost == "":
+            card_cost = None
+        else:
+            try:
+                card_cost = int(card_cost)
+            except:
+                print("Invalid card cost")
+                return
+
+        card_rarity = input("Enter card rarity (Free/Common/Rare/Epic/Legendary) (press Enter to skip): ")
+        card_rarity = card_rarity.strip().lower()
+        print("")
+
+        if card_rarity == "":
+            card_rarity = None
+        elif card_rarity != "free" and card_rarity != "common" and card_rarity != "rare" and card_rarity != "epic" and card_rarity != "legendary":
+            print("Invalid card rarity")
+            return
+
+        card_type = input("Enter card type (Minion/Spell/Weapon) (press Enter to skip): ")
+        card_type = card_type.strip().lower()
+        print("")
+
+        if card_type == "":
+            card_type = None
+        elif card_type != "minion" and card_type != "spell" and card_type != "weapon":
+            print("Invalid card type")
+            return
+
+        class_name = input("Enter full class name (press Enter to skip): ")
+        class_name = class_name.strip()
+        print("")
+
+        if class_name == "":
+            class_name = None
+        elif self.db.check_class(class_name) == False:
+            print("Invalid class name")
+            return
+
+        search_results = self.db.get_cards(card_name, card_cost, card_rarity, card_type, class_name)
+
+        print("Search parameters:")
+        print("Card Name:", card_name if card_name is not None else "None")
+        print("Mana Cost:", card_cost if card_cost is not None else "None")
+        print("Card Rarity:", card_rarity if card_rarity is not None else "None")
+        print("Card Type:", card_type if card_type is not None else "None")
+        print("Class Name:", class_name if class_name is not None else "None")
+        print("")
+        
+        if len(search_results) == 0:
+            print("No results found")
+        else:
+            print(len(search_results), "cards found")
+            for card in search_results:
+                print(card)

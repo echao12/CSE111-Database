@@ -621,14 +621,14 @@ class HSDB:
             if card_rarity is not None:
                 if len(sql_where) > 5:
                     sql_where += " AND"
-                sql_where += " card_rarity = ?"
+                sql_where += " card_rarity like ?"
                 sql_parameters += (card_rarity,)
 
             # card_type
             if card_type is not None:
                 if len(sql_where) > 5:
                     sql_where += " AND"
-                sql_where += " card_type = ?"
+                sql_where += " card_type like ?"
                 sql_parameters += (card_type,)
 
             # class_name
